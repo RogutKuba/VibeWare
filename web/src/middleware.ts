@@ -8,17 +8,17 @@ const USER_TO_DEPLOYMENTS_MAP = {
     'https://vibe-ware-git-vibeware-dy7ucmaagrcx75lfcmgu7-rogut-kuba.vercel.app',
 };
 
-const vibewareMiddleware = (id: string) => {
+const vibewareMiddleware = (id: string | null) => {
+  console.log('vibewareID', id);
   return (request: NextRequest) => {
     // Prevent rewrite loops by checking if we've already rewritten
-    if (request.headers.get('x-middleware-rewrite')) {
-      console.log('Already rewritten, skipping middleware');
+    if (request.headers.get('x-middleware-rewrite') || !id) {
+      // console.log('Already rewritten, skipping middleware');
       return NextResponse.next();
     }
 
     const currentHost = request.nextUrl.hostname;
     const pathname = request.nextUrl.pathname;
-    const search = request.nextUrl.search;
 
     console.log('=== MIDDLEWARE DEBUG ===');
     console.log('User ID:', id);
@@ -36,13 +36,17 @@ const vibewareMiddleware = (id: string) => {
       if (currentHost !== targetHost) {
         // Create a new URL object for the rewrite
         const rewriteUrl = new URL(targetHost);
+        // if / is last char, dont add it to the rewrite url
+        if (pathname.endsWith('/')) {
+          rewriteUrl.pathname = rewriteUrl.pathname.slice(0, -1);
+        }
+
+        const requestHeaders = new Headers(request.headers);
+        requestHeaders.set('x-middleware-rewrite', 'true');
         console.log('Rewriting to:', rewriteUrl.toString());
-
-        const response = NextResponse.rewrite(rewriteUrl);
-        // Add header to prevent loops
-        response.headers.set('x-middleware-rewrite', 'true');
-
-        return response;
+        return NextResponse.rewrite(rewriteUrl, {
+          headers: requestHeaders,
+        });
       } else {
         console.log('Already on target host, no rewrite needed');
       }
@@ -55,14 +59,36 @@ const vibewareMiddleware = (id: string) => {
 };
 
 export default clerkMiddleware(async (auth, req) => {
-  return vibewareMiddleware((await auth()).userId ?? '')(req);
+  console.log('auth exists', !!auth);
+
+  try {
+    const protect = await auth();
+    return vibewareMiddleware(protect.userId ?? null)(req);
+  } catch (error) {
+    console.error('Error in clerkMiddleware', error);
+    return NextResponse.next();
+  }
+  // const pathname = req.nextUrl.pathname;
+  // // an exmaple to use any middleware you want to run before clerkMiddleware or to opt out clerkMiddleware.
+  // if (
+  //   pathname.startsWith('/_next') ||
+  //   pathname.startsWith('/favicon.ico') ||
+  //   pathname.includes('.')
+  // ) {
+  //   return NextResponse.next();
+  // }
+
+  // console.log('auth.fn', auth);
+
+  // const protect = await auth();
+  // return vibewareMiddleware(protect.userId ?? null)(req);
 });
 
-export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
-};
+// export const config = {
+//   matcher: [
+//     // Skip Next.js internals and all static files, unless found in search params
+//     '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+//     // Always run for API routes
+//     '/(api|trpc)(.*)',
+//   ],
+// };
