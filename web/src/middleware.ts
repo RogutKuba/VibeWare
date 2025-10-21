@@ -1,5 +1,5 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const USER_TO_DEPLOYMENTS_MAP = {
   user_34OPUHayKIB0u2jdw8UdCbgT2QL:
@@ -8,42 +8,21 @@ const USER_TO_DEPLOYMENTS_MAP = {
     'vibe-ware-git-vibeware-d4o6dbeiab4hz9rsfb-jnl-rogut-kuba.vercel.app',
 };
 
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();
-
-  console.log('userId', userId);
-
-  const isUserInMap =
-    USER_TO_DEPLOYMENTS_MAP[userId as keyof typeof USER_TO_DEPLOYMENTS_MAP];
-
-  // Only redirect if user is authenticated
-  if (isUserInMap) {
-    const url = new URL(req.url);
-    const currentHost = url.hostname;
-    const targetHost = `${
-      USER_TO_DEPLOYMENTS_MAP[userId as keyof typeof USER_TO_DEPLOYMENTS_MAP]
-    }`;
-
-    // Only redirect if:
-    // 1. We're in production (vercel.app domain)
-    // 2. We're not already on the correct subdomain
-    const isVercelDomain = currentHost.includes('vercel.app');
-    const isCorrectSubdomain = currentHost === targetHost;
-
-    if (isVercelDomain && !isCorrectSubdomain) {
-      console.log('redirecting to', targetHost);
-      // Create new URL with user-specific subdomain
-      const redirectUrl = new URL(req.url);
-      redirectUrl.hostname = targetHost;
-
-      console.log('redirecting to', redirectUrl);
-
-      return NextResponse.redirect(redirectUrl);
+const vibewareMiddleware = (id: string) => {
+  return (request: NextRequest) => {
+    const rewrite =
+      USER_TO_DEPLOYMENTS_MAP[id as keyof typeof USER_TO_DEPLOYMENTS_MAP];
+    if (!rewrite) {
+      return NextResponse.next();
     }
-  }
 
-  // Continue with default Clerk middleware behavior
-  return NextResponse.next();
+    console.log(`Rewriting to ${rewrite}`);
+    return NextResponse.rewrite(`${rewrite}${request.nextUrl.pathname}`);
+  };
+};
+
+export default clerkMiddleware(async (auth, req) => {
+  return vibewareMiddleware((await auth()).userId ?? '')(req);
 });
 
 export const config = {
