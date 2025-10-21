@@ -16,7 +16,7 @@ import {
 import { agentsTable } from '@/db/agent.db';
 import { CreateDeploymentResponseBody } from '@vercel/sdk/esm/models/createdeploymentop';
 
-export const DEMO_REPO = 'RogutKuba/test-fe';
+export const DEMO_REPO = 'RogutKuba/vibeware';
 export const DEMO_ORG = 'rogutkuba';
 
 export const deploymentRoutes = new Elysia({ prefix: '/deployment' })
