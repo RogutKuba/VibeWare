@@ -22,7 +22,7 @@ export default clerkMiddleware(async (auth, req) => {
     const currentHost = url.hostname;
     const targetHost = `${
       USER_TO_DEPLOYMENTS_MAP[userId as keyof typeof USER_TO_DEPLOYMENTS_MAP]
-    }.vercel.app`;
+    }`;
 
     // Only redirect if:
     // 1. We're in production (vercel.app domain)
