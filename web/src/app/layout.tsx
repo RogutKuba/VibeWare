@@ -37,18 +37,18 @@ export default function RootLayout({
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          <header className="border-b border-gray-200 dark:border-gray-800">
+          <header className="bg-red-600 border-b border-red-700">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-              <h1 className="text-xl font-bold">Todo List</h1>
+              <h1 className="text-xl font-bold text-white">Todo List</h1>
               <div className="flex gap-4 items-center">
                 <SignedOut>
                   <SignInButton mode="modal">
-                    <button className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">
+                    <button className="px-4 py-2 text-sm font-medium text-white hover:text-gray-200">
                       Sign In
                     </button>
                   </SignInButton>
                   <SignUpButton mode="modal">
-                    <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                    <button className="px-4 py-2 text-sm font-medium text-red-600 bg-white rounded-md hover:bg-gray-100">
                       Sign Up
                     </button>
                   </SignUpButton>
