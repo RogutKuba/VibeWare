@@ -35,9 +35,7 @@ const vibewareMiddleware = (id: string) => {
       // Only rewrite if we're NOT already on the target deployment
       if (currentHost !== targetHost) {
         // Create a new URL object for the rewrite
-        const rewriteUrl = new URL(request.url);
-        rewriteUrl.hostname = targetHost;
-
+        const rewriteUrl = new URL(targetHost);
         console.log('Rewriting to:', rewriteUrl.toString());
 
         const response = NextResponse.rewrite(rewriteUrl);
