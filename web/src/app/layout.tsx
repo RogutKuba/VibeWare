@@ -8,6 +8,7 @@ import {
   SignedOut,
   UserButton,
 } from "@clerk/nextjs";
+import ChatWidget from "@/components/ChatWidget";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,6 +60,7 @@ export default function RootLayout({
             </div>
           </header>
           {children}
+          <ChatWidget />
         </body>
       </html>
     </ClerkProvider>
