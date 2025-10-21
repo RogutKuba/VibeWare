@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const USER_TO_DEPLOYMENTS_MAP = {
   user_34OPUHayKIB0u2jdw8UdCbgT2QL:
-    'vibe-ware-git-vibeware-d4o6dbeiab4hz9rsfb-jnl-rogut-kuba.vercel.app',
+    'https://vibe-ware-git-vibeware-d4o6dbeiab4hz9rsfb-jnl-rogut-kuba.vercel.app',
   user_34OQYLsOuLRH85ySWzWBeQRQ4Lr:
-    'vibe-ware-git-vibeware-dy7ucmaagrcx75lfcmgu7-rogut-kuba.vercel.app',
+    'https://vibe-ware-git-vibeware-dy7ucmaagrcx75lfcmgu7-rogut-kuba.vercel.app',
 };
 
 const vibewareMiddleware = (id: string) => {
