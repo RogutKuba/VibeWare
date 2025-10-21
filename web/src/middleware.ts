@@ -10,14 +10,14 @@ const USER_TO_DEPLOYMENTS_MAP = {
 
 const vibewareMiddleware = (id: string) => {
   return (request: NextRequest) => {
-    const rewrite =
-      USER_TO_DEPLOYMENTS_MAP[id as keyof typeof USER_TO_DEPLOYMENTS_MAP];
-    if (!rewrite) {
-      return NextResponse.next();
+    if (id in USER_TO_DEPLOYMENTS_MAP) {
+      const rewrite =
+        USER_TO_DEPLOYMENTS_MAP[id as keyof typeof USER_TO_DEPLOYMENTS_MAP];
+      console.log(`Rewriting to ${rewrite}`);
+      return NextResponse.rewrite(`${rewrite}${request.nextUrl.pathname}`);
     }
 
-    console.log(`Rewriting to ${rewrite}`);
-    return NextResponse.rewrite(`${rewrite}${request.nextUrl.pathname}`);
+    return NextResponse.next();
   };
 };
 
